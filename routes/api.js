@@ -14,7 +14,7 @@ var ObjectId = require('mongodb').ObjectId;
 const MONGODB_CONNECTION_STRING = process.env.DB;
 //Example connection: MongoClient.connect(MONGODB_CONNECTION_STRING, function(err, db) {});
 
-const collection = 'books'
+const db_collection = 'books'
 
 module.exports = function (app) {
 
@@ -23,7 +23,7 @@ module.exports = function (app) {
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
       MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
-        let collection = db.collection(collection)
+        let collection = db.collection(db_collection)
         collection.find().toArray((err,docs) => {res.json(docs)})
       });
     })
@@ -34,7 +34,7 @@ module.exports = function (app) {
       } else{
         let book = {title: req.body.title}
         MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
-          let collection = db.collection(collection)
+          let collection = db.collection(db_collection)
           collection.insertOne(book, (err, data) => {
             book._id = data.insertedId;
             res.json(book)
