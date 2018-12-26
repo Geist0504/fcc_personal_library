@@ -24,7 +24,7 @@ module.exports = function (app) {
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
       MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
         let collection = db.collection(db_collection)
-        collection.find().toArray((err,docs) => {res.json(docs)})
+        collection.find().toArray((err,docs) => {          res.json(docs)})
       });
     })
     
@@ -58,8 +58,17 @@ module.exports = function (app) {
 
   app.route('/api/books/:id')
     .get(function (req, res){
-      var bookid = req.params.id;
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+      if(!req.params.id){
+        res.send('missing id')
+      } else{
+        var bookid = req.params.id;
+        MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
+          let collection = db.collection(db_collection)
+          collection.findOne({_id: new ObjectId(bookid)} ,(err,book) => {
+            res.json(book)})
+        });
+      }
     })
     
     .post(function(req, res){
