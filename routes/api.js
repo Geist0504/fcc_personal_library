@@ -24,7 +24,7 @@ module.exports = function (app) {
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
       MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
         let collection = db.collection(db_collection)
-        collection.find().toArray((err,docs) => {          res.json(docs)})
+        collection.find().toArray((err,docs) => {res.json(docs)})
       });
     })
     
@@ -72,9 +72,22 @@ module.exports = function (app) {
     })
     
     .post(function(req, res){
-      var bookid = req.params.id;
-      var comment = req.body.comment;
-      //json res format same as .get
+    console.log(req.params)
+      if(!req.params.id || !req.params.comment ){
+          res.send('missing input')
+        }else{
+          let bookid = new ObjectId(req.params.id);
+          let comment = req.body.comment;
+          MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
+          let collection = db.collection(db_collection)
+          collection.findAndModify({_id: bookid},[['_id', 1]],{$push: {comments: comment}}, {new: true}, (err, data) => {
+            if(err){res.send('could not update ' + bookid)} 
+            else {res.json(data)}
+          })
+        })
+          
+        }
+          //json res format same as .get
     })
     
     .delete(function(req, res){
