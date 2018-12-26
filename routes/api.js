@@ -72,8 +72,8 @@ module.exports = function (app) {
     })
     
     .post(function(req, res){
-    console.log(req.params)
-      if(!req.params.id || !req.params.comment ){
+    console.log(req.body)
+      if(!req.params.id || !req.body.comment ){
           res.send('missing input')
         }else{
           let bookid = new ObjectId(req.params.id);
@@ -82,7 +82,7 @@ module.exports = function (app) {
           let collection = db.collection(db_collection)
           collection.findAndModify({_id: bookid},[['_id', 1]],{$push: {comments: comment}}, {new: true}, (err, data) => {
             if(err){res.send('could not update ' + bookid)} 
-            else {res.json(data)}
+            else {res.json({_id: data.value._id, title: data.value.title, comments: data.value.comments})}
           })
         })
           
