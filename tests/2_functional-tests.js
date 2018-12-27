@@ -48,6 +48,7 @@ suite('Functional Tests', function() {
           assert.equal(res.status, 200);
           assert.equal(res.body.title, 'The Lord of the Rings');
           assert.property(res.body, '_id')
+          assert.property(res.body, 'commentcount')
           done();
         });
       });
@@ -73,7 +74,6 @@ suite('Functional Tests', function() {
         .get('/api/books')
         .end(function(err, res){
           assert.equal(res.status, 200);
-          console.log(res.body[0])
           assert.isArray(res.body, 'response should be an array');
           assert.property(res.body[0], 'commentcount', 'Books in array should contain commentcount');
           assert.property(res.body[0], 'title', 'Books in array should contain title');
@@ -88,7 +88,17 @@ suite('Functional Tests', function() {
     suite('GET /api/books/[id] => book object with [id]', function(){
       
       test('Test GET /api/books/[id] with id not in db',  function(done){
-        //done();
+        chai.request(server)
+        .get('/api/books/[id]')
+        .send({_id: '5c242bc2d9b44e207de87638'})
+        .end(function(err, res){
+          assert.equal(res.status, 200);
+          console.log(res)
+          assert.property(res.body[0], 'commentcount', 'Books in array should contain commentcount');
+          assert.property(res.body[0], 'title', 'Books in array should contain title');
+          assert.property(res.body[0], '_id', 'Books in array should contain _id');
+          done();
+        });
       });
       
       test('Test GET /api/books/[id] with valid id in db',  function(done){

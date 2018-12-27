@@ -39,7 +39,11 @@ module.exports = function (app) {
       if(!req.body.title){
         res.send('missing title')
       } else{
-        let book = {title: req.body.title}
+        let book = {
+          title: req.body.title,
+          comments: [],
+          commentcount: 0
+        }
         MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
           let collection = db.collection(db_collection)
           collection.insertOne(book, (err, data) => {
@@ -86,7 +90,7 @@ module.exports = function (app) {
           let comment = req.body.comment;
           MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
           let collection = db.collection(db_collection)
-          collection.findAndModify({_id: bookid},[['_id', 1]],{$push: {comments: comment}}, {$inc: commentcount}, {new: true}, (err, data) => {
+          collection.findAndModify({_id: bookid},[['_id', 1]],{$push: {comments: comment}, $inc: {commentcount: 1}}, {new: true}, (err, data) => {
             if(err){res.send('could not update ' + bookid)} 
             else {res.json({_id: data.value._id, title: data.value.title, comments: data.value.comments})}
             })
