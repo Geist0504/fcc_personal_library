@@ -41,11 +41,27 @@ suite('Functional Tests', function() {
     suite('POST /api/books with title => create book object/expect book object', function() {
       
       test('Test POST /api/books with title', function(done) {
-        //done();
+        chai.request(server)
+        .post('/api/books')
+        .send({title: 'The Lord of the Rings'})
+        .end(function(err, res){
+          assert.equal(res.status, 200);
+          assert.equal(res.body.title, 'The Lord of the Rings');
+          assert.property(res.body, '_id')
+          done();
+        });
       });
       
       test('Test POST /api/books with no title given', function(done) {
-        //done();
+        chai.request(server)
+        .post('/api/books')
+        .send({})
+        .end(function(err, res){
+          assert.equal(res.status, 200);
+          assert.equal(res.text, 'The Lord of the Rings');
+          assert.property(res.body, '_id')
+          done();
+        });
       });
       
     });

@@ -66,13 +66,12 @@ module.exports = function (app) {
         MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
           let collection = db.collection(db_collection)
           collection.findOne({_id: new ObjectId(bookid)} ,(err,book) => {
-            res.json(book)})
+            err ? res.send('no book exists') : res.json(book)})
         });
       }
     })
     
     .post(function(req, res){
-    console.log(req.body)
       if(!req.params.id || !req.body.comment ){
           res.send('missing input')
         }else{
@@ -83,16 +82,21 @@ module.exports = function (app) {
           collection.findAndModify({_id: bookid},[['_id', 1]],{$push: {comments: comment}}, {new: true}, (err, data) => {
             if(err){res.send('could not update ' + bookid)} 
             else {res.json({_id: data.value._id, title: data.value.title, comments: data.value.comments})}
+            })
           })
-        })
-          
         }
           //json res format same as .get
     })
     
     .delete(function(req, res){
-      var bookid = req.params.id;
+      let bookid = req.params.id;
       //if successful response will be 'delete successful'
+      MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
+        let collection = db.collection(db_collection)
+        collection.deleteOne({_id: new ObjectId(bookid)}, (err, data) => {
+          err ? res.send(err) : res.send('delete successful')
+        })
+      })
     });
   
 };
