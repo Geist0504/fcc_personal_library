@@ -25,8 +25,7 @@ module.exports = function (app) {
       MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
         let collection = db.collection(db_collection)
         collection.find().toArray((err,docs) => {
-          console.log(docs.comments)
-          if(docs.comments){console.log('comments')
+          if(docs.comments){
             docs.commentcount = docs.comments.length
           }else{
             docs.commentcount = 0}
@@ -77,7 +76,7 @@ module.exports = function (app) {
         MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
           let collection = db.collection(db_collection)
           collection.findOne({_id: new ObjectId(bookid)} ,(err,book) => {
-            err ? res.send('no book exists') : res.json(book)})
+            book === null ? res.send('no book exists') : res.json(book)})
         });
       }
     })

@@ -89,20 +89,22 @@ suite('Functional Tests', function() {
       
       test('Test GET /api/books/[id] with id not in db',  function(done){
         chai.request(server)
-        .get('/api/books/[id]')
-        .send({_id: '5c242bc2d9b44e207de87638'})
+        .get('/api/books/8c242bc2d9b44e207de87638')
         .end(function(err, res){
           assert.equal(res.status, 200);
-          console.log(res)
-          assert.property(res.body[0], 'commentcount', 'Books in array should contain commentcount');
-          assert.property(res.body[0], 'title', 'Books in array should contain title');
-          assert.property(res.body[0], '_id', 'Books in array should contain _id');
+          assert.equal(res.text, 'no book exists');
           done();
         });
       });
       
       test('Test GET /api/books/[id] with valid id in db',  function(done){
-        //done();
+        chai.request(server)
+        .get('/api/books/5c242bc61e8ca220c63d981a')
+        .end(function(err, res){
+          assert.equal(res.status, 200);
+          assert.equal(res.body.title, 'The Lord of the Rings');
+          done();
+        });
       });
       
     });
@@ -111,7 +113,15 @@ suite('Functional Tests', function() {
     suite('POST /api/books/[id] => add comment/expect book object with id', function(){
       
       test('Test POST /api/books/[id] with comment', function(done){
-        //done();
+        chai.request(server)
+        .post('/api/books')
+        .send({_id: '5c242bc2d9b44e207de87638',
+              comment:'Best Book EVER'})
+        .end(function(err, res){
+          assert.equal(res.status, 200);
+          assert.equal(res.body.title, 'The Lord of the Rings');
+          done();
+        });
       });
       
     });
