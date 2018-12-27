@@ -114,12 +114,12 @@ suite('Functional Tests', function() {
       
       test('Test POST /api/books/[id] with comment', function(done){
         chai.request(server)
-        .post('/api/books')
-        .send({_id: '5c242bc2d9b44e207de87638',
-              comment:'Best Book EVER'})
+        .post('/api/books/5c242bc2d9b44e207de87638')
+        .send({comment:'Best Book EVER'})
         .end(function(err, res){
           assert.equal(res.status, 200);
           assert.equal(res.body.title, 'The Lord of the Rings');
+          assert.equal(res.body.comments[0], 'Best Book EVER');
           done();
         });
       });
