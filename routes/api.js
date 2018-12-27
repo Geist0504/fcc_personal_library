@@ -24,7 +24,14 @@ module.exports = function (app) {
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
       MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
         let collection = db.collection(db_collection)
-        collection.find().toArray((err,docs) => {res.json(docs)})
+        collection.find().toArray((err,docs) => {
+          console.log(docs.comments)
+          if(docs.comments){console.log('comments')
+            docs.commentcount = docs.comments.length
+          }else{
+            docs.commentcount = 0}
+          res.json(docs)
+        })
       });
     })
     
@@ -79,7 +86,7 @@ module.exports = function (app) {
           let comment = req.body.comment;
           MongoClient.connect(MONGODB_CONNECTION_STRING, (err, db) => {
           let collection = db.collection(db_collection)
-          collection.findAndModify({_id: bookid},[['_id', 1]],{$push: {comments: comment}}, {new: true}, (err, data) => {
+          collection.findAndModify({_id: bookid},[['_id', 1]],{$push: {comments: comment}}, {$inc: commentcount}, {new: true}, (err, data) => {
             if(err){res.send('could not update ' + bookid)} 
             else {res.json({_id: data.value._id, title: data.value.title, comments: data.value.comments})}
             })
